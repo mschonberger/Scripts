@@ -10,6 +10,14 @@ public class Monster
     [SerializeField] MonsterBase _base;
     [SerializeField] int level;
 
+    public Monster(MonsterBase mBase, int mLevel)
+    {
+        _base = mBase;
+        level = mLevel;
+
+        Init();
+    }
+
     public MonsterBase Base { get { return _base; } }
     public int Level { get { return level; } }
 
@@ -23,7 +31,7 @@ public class Monster
     public Condition VolatileStatus { get; private set; }
     public int StatusTime { get; set; }
     public int VolatileStatusTime { get; set; }
-    public Queue<string> StatusChanges { get; private set; } = new Queue<string>(); //Wie eine Liste, man kann Elemente entfernen in der Reihenfolge wie sie hinzugefügt wurden
+    public Queue<string> StatusChanges { get; private set; } //Wie eine Liste, man kann Elemente entfernen in der Reihenfolge wie sie hinzugefügt wurden
     public bool HPChanged { get; set; }
     public event System.Action OnStatusChanged;
 
@@ -43,6 +51,8 @@ public class Monster
 
         CalculateStats();
         HP = MaxHP;
+
+        StatusChanges = new Queue<string>();
 
         ResetStatBoost();
         Status = null;

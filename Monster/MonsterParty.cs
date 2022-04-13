@@ -27,4 +27,16 @@ public class MonsterParty : MonoBehaviour
     {
         return monsters.Where(x => x.HP > 0).FirstOrDefault(); //Linq-Funktion: Where loopt durch die Monster Liste und gibt alle Elemente wieder die die Konditionen erfüllen
     }
+
+    public void AddMonster(Monster newMonster)
+    {
+        if (monsters.Count < 6)
+        {
+            monsters.Add(newMonster);
+        }
+        else
+        {
+            //to do: After implementation of a storage system
+        }
+    }
 }

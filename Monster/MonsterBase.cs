@@ -27,6 +27,8 @@ public class MonsterBase : ScriptableObject
     [SerializeField] int spDefense;
     [SerializeField] int speed;
 
+    [SerializeField] int catchRate; //between 0 and 255. higher = easier
+
     [SerializeField] List<LearnableMove> learnableMoves;
 
     public string Name {
@@ -92,6 +94,9 @@ public class MonsterBase : ScriptableObject
     {
         get { return learnableMoves; }
     }
+    
+    //Shorter way of writing
+    public int CatchRate => catchRate;
 }
 
 [System.Serializable]

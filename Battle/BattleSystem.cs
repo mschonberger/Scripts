@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ public class BattleSystem : MonoBehaviour
     [SerializeField] PartyScreen partyScreen;
     [SerializeField] Image playerImage;
     [SerializeField] Image trainerImage;
+    [SerializeField] GameObject catchingDeviceSprite;
 
     public event Action<bool> OnBattleOver;
     public Color highlights;
@@ -33,6 +35,8 @@ public class BattleSystem : MonoBehaviour
     bool isTrainerBattle = false;
     PlayerController player;
     TrainerController trainer;
+
+    int escapeAttempts;
 
 
     public void StartBattle(MonsterParty playerParty, Monster wildMonster)
@@ -102,6 +106,7 @@ public class BattleSystem : MonoBehaviour
 
         }
 
+        escapeAttempts = 0;
         partyScreen.Init();
         ActionSelection();
 
@@ -176,6 +181,15 @@ public class BattleSystem : MonoBehaviour
                 state = BattleState.Busy;
                 yield return SwitchMonster(selectedMonster);
             }
+            else if (playerAction == BattleAction.UseItem)
+            {
+                dialogBox.EnableActionSelector(false);
+                yield return ThrowDevice();
+            }
+            else if (playerAction == BattleAction.Run)
+            {
+                dialogBox.EnableActionSelector(false);
+                yield return TryToEscape();            }
 
             //Gegner kriegt den Zug
             var enemyMove = enemyUnit.Monster.GetRandomMove();
@@ -449,20 +463,24 @@ public class BattleSystem : MonoBehaviour
         {
             if (currentAction == 0)
             {
+                //Fight
                 MoveSelection();
             } 
             else if (currentAction == 1)
             {
+                //Team
                 previousState = state;
                 OpenPartyScreen();
             }
             else if (currentAction == 2)
             {
                 //Bag
+                StartCoroutine(RunTurns(BattleAction.UseItem));
             }
             else if (currentAction == 3)
             {
                 //Run
+                StartCoroutine(RunTurns(BattleAction.Run));
             }
         }
     }
@@ -645,5 +663,123 @@ public class BattleSystem : MonoBehaviour
         yield return dialogBox.TypeDialog($"{trainer.Name} send out {nextMonster.Base.Name}.");
 
         state = BattleState.RunningTurn;
+    }
+
+    int TryToCatchMonster(Monster monster)
+    {
+        float a = (3 * monster.MaxHP - 2 * monster.HP) * monster.Base.CatchRate * ConditionsDB.GetStatusBonus(monster.Status) / (3 * monster.MaxHP);
+
+        if (a >= 255)
+            return 4;
+
+        float b = 1048560 / Mathf.Sqrt(Mathf.Sqrt(16711680 / a));
+
+        int shakeCount = 0;
+        while (shakeCount < 4)
+        {
+            if (UnityEngine.Random.Range(0, 65535) >= b)
+                break;
+
+            ++shakeCount;
+        }
+
+        return shakeCount;
+    }
+
+    IEnumerator ThrowDevice()
+    {
+        if (isTrainerBattle)
+        {
+            yield return dialogBox.TypeDialog($"You can't steal other trainers monster!");
+            state = BattleState.RunningTurn;
+            yield break;
+        }
+
+
+        state = BattleState.Busy;
+
+        yield return dialogBox.TypeDialog($"{player.Name} throws his catching thingy.");
+
+        var catchingDeviceObject = Instantiate(catchingDeviceSprite, playerUnit.transform.position - new Vector3(2, 0), Quaternion.identity);
+        var catchingDevice = catchingDeviceObject.GetComponent<SpriteRenderer>();
+
+        // Animations
+        yield return catchingDevice.transform.DOJump(enemyUnit.transform.position + new Vector3(0, 2), 2f, 1, 1f).WaitForCompletion();
+        yield return enemyUnit.PlayCaptureAnimation();
+        yield return catchingDevice.transform.DOMoveY(enemyUnit.transform.position.y - 1, 1.3f).WaitForCompletion();
+
+        int shakeCount = TryToCatchMonster(enemyUnit.Monster);
+
+        for (int i = 0; i < Mathf.Min(shakeCount, 3); ++i)
+        {
+            yield return new WaitForSeconds(0.5f);
+            yield return catchingDevice.transform.DOPunchRotation(new Vector3(0, 0, 10f), 0.8f).WaitForCompletion();
+        }
+	
+	    if (shakeCount == 4)
+	    {
+		    // Caught
+		    yield return dialogBox.TypeDialog($"{enemyUnit.Monster.Base.Name} was caught");
+		    yield return catchingDevice.DOFade(0, 1.5f).WaitForCompletion();
+
+            playerParty.AddMonster(enemyUnit.Monster);
+            yield return dialogBox.TypeDialog($"{enemyUnit.Monster.Base.Name} has been added to your party.");
+		
+		    Destroy(catchingDevice);
+            BattleOver(true);
+        }   else {
+
+            // Not Caught
+            yield return new WaitForSeconds(1f);
+            catchingDevice.DOFade(0, 0.2f);
+            yield return enemyUnit.PlayBreakOutAnimation();
+
+            if (shakeCount < 2)
+                yield return dialogBox.TypeDialog($"{enemyUnit.Monster.Base.Name} broke free!");
+            else
+                yield return dialogBox.TypeDialog($"Almost caught it!");
+
+            Destroy(catchingDevice);
+            state = BattleState.RunningTurn;
+        }
+ 
+    }
+
+    IEnumerator TryToEscape()
+    {
+        state = BattleState.Busy;
+
+        if (isTrainerBattle)
+        {
+            yield return dialogBox.TypeDialog($"You can't run from trainer battles!");
+            state = BattleState.RunningTurn;
+            yield break;
+        }
+
+        ++escapeAttempts;
+
+        int playerSpeed = playerUnit.Monster.Speed;
+        int enemySpeed = enemyUnit.Monster.Speed;
+
+        if (enemySpeed < playerSpeed)
+        {
+            yield return dialogBox.TypeDialog($"Ran away safely!");
+            BattleOver(true);
+        } else
+        {
+            float f = (playerSpeed * 128) / enemySpeed + 30 * escapeAttempts;
+            f = f % 26;
+
+            if (UnityEngine.Random.Range(0, 256) < f)
+            {
+                yield return dialogBox.TypeDialog($"Ran away safely!");
+                BattleOver(true);
+            } else
+            {
+                yield return dialogBox.TypeDialog($"Can't escape!");
+                state = BattleState.RunningTurn;
+            }
+        }
+
     }
 }
