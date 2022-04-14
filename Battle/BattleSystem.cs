@@ -268,11 +268,7 @@ public class BattleSystem : MonoBehaviour
 
             if (targetUnit.Monster.HP <= 0)
             {
-                yield return dialogBox.TypeDialog($"{targetUnit.Monster.Base.Name} was defeated.");
-                targetUnit.PlayFaintAnimation();
-                yield return new WaitForSeconds(2f);
-
-                CheckForBattleOver(targetUnit);
+                yield return HandleMonsterFainted(targetUnit);
             }
         }
         else
@@ -298,7 +294,7 @@ public class BattleSystem : MonoBehaviour
             target.SetStatus(effects.Status);
         }
 
-        //Fl¸chtige Status Konditionen
+        //Fl√ºchtige Status Konditionen
         if (effects.VolatileStatus != ConditionID.none)
         {
             target.SetVolatileStatus(effects.VolatileStatus);
@@ -311,7 +307,7 @@ public class BattleSystem : MonoBehaviour
     IEnumerator RunAfterTurn(BattleUnit sourceUnit)
     {
         if (state == BattleState.BattleOver) yield break;
-        yield return new WaitUntil(() => state == BattleState.RunningTurn); // Pausiert die Ausf¸hrung bis der Status wieder auf RunningTurn gesprungen ist
+        yield return new WaitUntil(() => state == BattleState.RunningTurn); // Pausiert die Ausf√ºhrung bis der Status wieder auf RunningTurn gesprungen ist
 
         //Statuskonditionen wie psn oder brn verletzten das Monster nach dem Zug
         sourceUnit.Monster.OnAfterTurn();
@@ -319,11 +315,7 @@ public class BattleSystem : MonoBehaviour
         yield return sourceUnit.Hud.UpdateHP();
         if (sourceUnit.Monster.HP <= 0)
         {
-            yield return dialogBox.TypeDialog($"{sourceUnit.Monster.Base.Name} was defeated.");
-            sourceUnit.PlayFaintAnimation();
-            yield return new WaitForSeconds(2f);
-
-            CheckForBattleOver(sourceUnit);
+            yield return HandleMonsterFainted(sourceUnit);
             yield return new WaitUntil(() => state == BattleState.RunningTurn);
         }
     }
@@ -360,6 +352,33 @@ public class BattleSystem : MonoBehaviour
             var message = monster.StatusChanges.Dequeue();
             yield return dialogBox.TypeDialog(message);
         }
+    }
+
+    IEnumerator HandleMonsterFainted(BattleUnit faintedUnit) 
+    {
+    	yield return dialogBox.TypeDialog($"{faintedUnit.Monster.Base.Name} fainted.");
+    	faintedUnit.PlayFaintAnimation();
+	yield return new WaitForSeconds(2f);
+	
+	if (faintedUnit.IsPlayerUnit) 
+	{
+		//EXP Gain
+		int xpYield = faintedUnit.Monster.Base.XPGain;
+		int enemyLevel = faintedUnit.Monster.Level;
+		float trainerBonus = (isTrainerBattle)? 1.5f : 1f;
+		
+		int xpGain = Mathf.FloorToInt((xpYield * enemyLevel * trainerBonus) / 7);
+		playerUnit.Monster.XP += xpGain;
+		yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} gained {xpGain} Experience.");
+		yield return playerUnit.Hud.SetXPSmooth();
+		
+		//Check Level Up
+		
+		
+		yield return new WaitForSeconds(1f);
+	}
+	
+	CheckForBattleOver(faintedUnit);
     }
 
     void CheckForBattleOver(BattleUnit faintedUnit)
