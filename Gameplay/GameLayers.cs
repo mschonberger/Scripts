@@ -2,6 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*Die Klasse GameLayer wird für die Differenzierung der einzelnen Spielebenen genutzt.
+
+Ebenen und ihre Funktion:
+SolidObjects = Dient als Blockade bzw. Einschränkung für Spielerbewegung
+Grass= Um Flächen zu markieren, wo wilde Monster erscheinen können
+Interactable = Erlaubt es mit dem Spieler zu interagieren
+Player = Ebene auf dem der Spieler zu finden ist
+Field of View = Für die Sichtweite von Trainern oder um Events auszulösen.
+*/
+
 public class GameLayers : MonoBehaviour
 {
     [SerializeField] LayerMask solidObjectsLayer;
