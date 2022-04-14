@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-/* Die Klasse BattleHUD wird für die Darstellung der richtigen Monsterdaten verwendet - sowohl Player als auch Enemy Units.
+/* Die Klasse BattleHUD wird fÃ¼r die Darstellung der richtigen Monsterdaten verwendet - sowohl Player als auch Enemy Units.
    Die Berechnung der korrekten HP werden von hier gestartet. */
 
 public class BattleHud : MonoBehaviour
@@ -13,6 +13,7 @@ public class BattleHud : MonoBehaviour
     [SerializeField] Text hpDisplayText;
     [SerializeField] Text statusText;
     [SerializeField] HPBar hpBar;
+    [SerializeField] GameObject xpBar;
 
     [SerializeField] Color psnColor;
     [SerializeField] Color brnColor;
@@ -32,6 +33,8 @@ public class BattleHud : MonoBehaviour
         levelText.text = "Lvl " + monster.Level;
         hpDisplayText.text = $"{monster.HP} / {monster.MaxHP}";
         hpBar.SetHP((float)monster.HP / monster.MaxHP);
+        SetXP();
+        
         statusColors = new Dictionary<ConditionID, Color>
         {
             {ConditionID.psn, psnColor },
@@ -58,6 +61,32 @@ public class BattleHud : MonoBehaviour
             statusText.text = _monster.Status.Id.ToString().ToUpper();
             statusText.color = statusColors[_monster.Status.Id];
         }
+    }
+    
+    public void SetXP()
+    {
+         if (xpBar == null) return;
+         
+         float normalizedXP = GetNormalizedXP();
+         xpBar.transform.localScale = new Vector3 (normalizedXP, 1, 1);
+    }
+    
+    public IEnumerator void SetXPSmooth()
+    {
+         if (xpBar == null) yield break;
+         
+         float normalizedXP = GetNormalizedXP();
+         yield return xpBar.transform.DOScaleX(normalizedXP, 1.5f).WaitForCompletion();
+         
+    }
+
+    float GetNormalizedXP()
+    {
+         int currentLevelXP = _monster.Base.GetXPForLevel(_monster.Level);
+         int nextLevelXP = _monster.Base.GetXPForLevel(_monster.Level + 1);
+         
+         float normalizedXP = (float)(_monster.XP - currentLevelXP) / (nextLevelXP - currentLevelXP);    
+         return Mathf.Clamp01(normalizedXP);
     }
 
     public IEnumerator UpdateHP()
