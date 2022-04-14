@@ -54,6 +54,8 @@ public class MonsterBase : ScriptableObject
         {
             return GetFluctuating(level);
         }
+
+        Debug.Log($"Error -1 für GetXPForLevel");
         return -1;
     }
     
@@ -139,7 +141,6 @@ public class MonsterBase : ScriptableObject
     
     //Shorter way of writing
     public int CatchRate => catchRate;
-    
     public int XPGain => xpGain;
     public GrowthRate GrowthRate => growthRate;
 }
@@ -189,7 +190,7 @@ public enum GrowthRate
     Fast,
     MediumFast,
     MediumSlow,
-    Slow
+    Slow,
     Fluctuating
 }
 

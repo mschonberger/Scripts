@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -71,7 +72,7 @@ public class BattleHud : MonoBehaviour
          xpBar.transform.localScale = new Vector3 (normalizedXP, 1, 1);
     }
     
-    public IEnumerator void SetXPSmooth()
+    public IEnumerator SetXPSmooth()
     {
          if (xpBar == null) yield break;
          

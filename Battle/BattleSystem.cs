@@ -270,11 +270,11 @@ public class BattleSystem : MonoBehaviour
             {
                 yield return HandleMonsterFainted(targetUnit);
             }
+
+        } else
+        {
+            yield return dialogBox.TypeDialog($"{sourceUnit.Monster.Base.Name}'s attack missed.");
         }
-        else
-            {
-                yield return dialogBox.TypeDialog($"{sourceUnit.Monster.Base.Name}'s attack missed.");
-            }
     }
 
     IEnumerator RunMoveEffects(MoveEffects effects, Monster source, Monster target, MoveTarget moveTarget)
@@ -358,24 +358,24 @@ public class BattleSystem : MonoBehaviour
     {
     	yield return dialogBox.TypeDialog($"{faintedUnit.Monster.Base.Name} fainted.");
     	faintedUnit.PlayFaintAnimation();
-	yield return new WaitForSeconds(2f);
+	    yield return new WaitForSeconds(2f);
 	
-	if (faintedUnit.IsPlayerUnit) 
-	{
-		//EXP Gain
-		int xpYield = faintedUnit.Monster.Base.XPGain;
-		int enemyLevel = faintedUnit.Monster.Level;
-		float trainerBonus = (isTrainerBattle)? 1.5f : 1f;
+	    if (!faintedUnit.IsPlayerUnit) 
+	    {
+		    //EXP Gain
+		    int xpYield = faintedUnit.Monster.Base.XPGain;
+		    int enemyLevel = faintedUnit.Monster.Level;
+		    float trainerBonus = (isTrainerBattle) ? 1.5f : 1f;
 		
-		int xpGain = Mathf.FloorToInt((xpYield * enemyLevel * trainerBonus) / 7);
-		playerUnit.Monster.XP += xpGain;
-		yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} gained {xpGain} Experience.");
-		yield return playerUnit.Hud.SetXPSmooth();
+		    int xpGain = Mathf.FloorToInt((xpYield * enemyLevel * trainerBonus) / 7);
+		    playerUnit.Monster.XP += xpGain;
+		    yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} gained {xpGain} Experience.");
+		    yield return playerUnit.Hud.SetXPSmooth();
 		
-		//Check Level Up
+		    //Check Level Up
 		
 		
-		yield return new WaitForSeconds(1f);
+		    yield return new WaitForSeconds(1f);
 	}
 	
 	CheckForBattleOver(faintedUnit);
