@@ -21,6 +21,8 @@ public class Monster
     public MonsterBase Base { get { return _base; } }
     public int Level { get { return level; } }
 
+    public int XP {get; set;}
+    
     public int HP { get; set; }
     public List<Move> Moves { get; set; }
     public Move CurrentMove { get; set; }
@@ -31,7 +33,7 @@ public class Monster
     public Condition VolatileStatus { get; private set; }
     public int StatusTime { get; set; }
     public int VolatileStatusTime { get; set; }
-    public Queue<string> StatusChanges { get; private set; } //Wie eine Liste, man kann Elemente entfernen in der Reihenfolge wie sie hinzugefügt wurden
+    public Queue<string> StatusChanges { get; private set; } //Wie eine Liste, man kann Elemente entfernen in der Reihenfolge wie sie hinzugefÃ¼gt wurden
     public bool HPChanged { get; set; }
     public event System.Action OnStatusChanged;
 
@@ -49,6 +51,8 @@ public class Monster
                 break;
         }
 
+        XP = Base.GetXPForLevel(Level);
+        
         CalculateStats();
         HP = MaxHP;
 
@@ -160,7 +164,7 @@ public class Monster
             Fainted = false
         };
 
-        float attack = (move.Base.Category == MoveCategory.Special) ? attacker.SpAttack : attacker.Attack; //Kürzere Variante für if/else
+        float attack = (move.Base.Category == MoveCategory.Special) ? attacker.SpAttack : attacker.Attack; //KÃ¼rzere Variante fÃ¼r if/else
         float defense = (move.Base.Category == MoveCategory.Special) ? SpDefense : Defense;
         
         float modifiers = Random.Range(0.85f, 1f) * type * critical;
@@ -182,7 +186,7 @@ public class Monster
         if (Status != null) return;
 
         Status = ConditionsDB.Conditions[conditionID];
-        Status?.OnStart?.Invoke(this); // ? überprüft ob null Status Kondition vorliegt, damit das Spiel nicht crasht
+        Status?.OnStart?.Invoke(this); // ? Ã¼berprÃ¼ft ob null Status Kondition vorliegt, damit das Spiel nicht crasht
         StatusChanges.Enqueue($"{Base.Name} {Status.StartMessage}");
         OnStatusChanged?.Invoke();
     }
@@ -191,7 +195,7 @@ public class Monster
         if (VolatileStatus != null) return;
 
         VolatileStatus = ConditionsDB.Conditions[conditionID];
-        VolatileStatus?.OnStart?.Invoke(this); // ? überprüft ob null Status Kondition vorliegt, damit das Spiel nicht crasht
+        VolatileStatus?.OnStart?.Invoke(this); // ? Ã¼berprÃ¼ft ob null Status Kondition vorliegt, damit das Spiel nicht crasht
         StatusChanges.Enqueue($"{Base.Name} {VolatileStatus.StartMessage}");
     }
     public void CureStatus()
@@ -228,7 +232,7 @@ public class Monster
     }
     public void OnAfterTurn()
     {
-        Status?.OnAfterTurn?.Invoke(this); //wird nur ausgeführt wenn OnAfterTurn != null
+        Status?.OnAfterTurn?.Invoke(this); //wird nur ausgefÃ¼hrt wenn OnAfterTurn != null
         VolatileStatus?.OnAfterTurn?.Invoke(this);
     }
     public void OnBattleOver()
