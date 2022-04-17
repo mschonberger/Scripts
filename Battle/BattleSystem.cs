@@ -146,6 +146,8 @@ public class BattleSystem : MonoBehaviour
             playerUnit.Monster.CurrentMove = playerUnit.Monster.Moves[currentMove];
             enemyUnit.Monster.CurrentMove = enemyUnit.Monster.GetRandomMove();
 
+            Debug.Log($"{playerUnit.Monster.XP} is the current XP");
+
             int playerMovePriority = playerUnit.Monster.CurrentMove.Base.Priority;
             int enemyMovePriority = enemyUnit.Monster.CurrentMove.Base.Priority;
 
@@ -370,10 +372,17 @@ public class BattleSystem : MonoBehaviour
 		    int xpGain = Mathf.FloorToInt((xpYield * enemyLevel * trainerBonus) / 7);
 		    playerUnit.Monster.XP += xpGain;
 		    yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} gained {xpGain} Experience.");
-		    yield return playerUnit.Hud.SetXPSmooth();
-		
-		    //Check Level Up
-		
+            yield return playerUnit.Hud.SetXPSmooth();
+
+            //Check Level Up
+            while (playerUnit.Monster.CheckForLevelUp())
+            {
+                playerUnit.Hud.SetLevel();
+                playerUnit.Monster.BoostStatsAfterLevelUp();
+                yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} reached Level {playerUnit.Monster.Level}!");
+
+                yield return playerUnit.Hud.SetXPSmooth(true);
+            }
 		
 		    yield return new WaitForSeconds(1f);
 	}

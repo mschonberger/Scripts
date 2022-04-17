@@ -122,6 +122,16 @@ public class Monster
         }
     }
 
+    public bool CheckForLevelUp()
+    {
+        if (XP > Base.GetXPForLevel(level + 1))
+        {
+            ++level;
+            return true;
+        }
+
+        return false;
+    }
 
     public int Attack {
     get { return GetStat(Stat.Attack); }
@@ -230,6 +240,15 @@ public class Monster
 
         return canPerformMove;
     }
+    public void BoostStatsAfterLevelUp()
+    {
+        var oldMaxHp = MaxHp;
+        CalculateStats();
+        var diff = MaxHp - oldMaxHp;
+
+        UpdateHP(-diff);
+    }
+
     public void OnAfterTurn()
     {
         Status?.OnAfterTurn?.Invoke(this); //wird nur ausgeführt wenn OnAfterTurn != null

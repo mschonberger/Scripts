@@ -31,7 +31,7 @@ public class BattleHud : MonoBehaviour
         _monster = monster;
 
         nameText.text = monster.Base.Name;
-        levelText.text = "Lvl " + monster.Level;
+        SetLevel();
         hpDisplayText.text = $"{monster.HP} / {monster.MaxHP}";
         hpBar.SetHP((float)monster.HP / monster.MaxHP);
         SetXP();
@@ -66,15 +66,23 @@ public class BattleHud : MonoBehaviour
     
     public void SetXP()
     {
-         if (xpBar == null) return;
+         if (xpBar == null) return; //because Enemy doesn't have one
          
          float normalizedXP = GetNormalizedXP();
          xpBar.transform.localScale = new Vector3 (normalizedXP, 1, 1);
     }
+
+    public void SetLevel()
+    {
+        levelText.text = "Lvl " + _monster.Level;
+    }
     
-    public IEnumerator SetXPSmooth()
+    public IEnumerator SetXPSmooth(bool reset = false)
     {
          if (xpBar == null) yield break;
+
+        if (reset)
+            xpBar.transform.localScale = new Vector3(0, 1, 1);
          
          float normalizedXP = GetNormalizedXP();
          yield return xpBar.transform.DOScaleX(normalizedXP, 1.5f).WaitForCompletion();

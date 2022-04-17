@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Sprite sprite;
     [SerializeField] string playerName;
 
+    const float offsetY = 0.3f;
+
     public event Action OnEncountered;
     public event Action<Collider2D> OnEnterTrainerView;
 
@@ -56,7 +58,7 @@ public class PlayerController : MonoBehaviour
 
     private void CheckForEncounters() //Funktion zum triggern von Begegnugen mit wilden Monstern
     {
-        if (Physics2D.OverlapCircle(transform.position, 0.2f, GameLayers.i.GrassLayer) != null)
+        if (Physics2D.OverlapCircle(transform.position - new Vector3(0, offsetY), 0.2f, GameLayers.i.GrassLayer) != null)
         {
             if (UnityEngine.Random.Range(1, 101) <= 10)
             {
@@ -68,7 +70,7 @@ public class PlayerController : MonoBehaviour
 
     private void CheckIfInTrainersView()
     {
-        var collider = Physics2D.OverlapCircle(transform.position, 0.2f, GameLayers.i.FieldOfViewLayer);
+        var collider = Physics2D.OverlapCircle(transform.position, offsetY, GameLayers.i.FieldOfViewLayer);
 
         if (collider != null)
         {
