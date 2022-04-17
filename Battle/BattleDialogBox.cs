@@ -158,6 +158,48 @@ public class BattleDialogBox : MonoBehaviour
 
     public void SetStatsBoxStats(int[] oldStats, int[] newStats)
     {
+        
+        if (newStats[0] - oldStats[0] > 0)
+            statHP.color = Color.red;
+        else
+            statHP.color = Color.black;
+
+
+
+        if (newStats[1] - oldStats[1] > 0)
+            statAttack.color = Color.red;
+        else
+            statAttack.color = Color.black;
+
+
+
+        if (newStats[2] - oldStats[2] > 0)
+            statSpAttack.color = Color.red;
+        else
+            statSpAttack.color = Color.black;
+
+
+
+        if (newStats[3] - oldStats[3] > 0)
+            statDefense.color = Color.red;
+        else
+            statDefense.color = Color.black;
+
+
+
+        if (newStats[4] - oldStats[4] > 0)
+            statSpDefense.color = Color.red;
+        else
+            statSpDefense.color = Color.black;
+
+
+
+        if (newStats[5] - oldStats[5] > 0)
+            statSpeed.color = Color.red;
+        else
+            statSpeed.color = Color.black;
+
+
         statHP.text = $"{oldStats[0]} -> {newStats[0]} (+{(newStats[0] - oldStats[0])})";
         statAttack.text = $"{oldStats[1]} -> {newStats[1]} (+{(newStats[1] - oldStats[1])})";
         statSpAttack.text = $"{oldStats[2]} -> {newStats[2]} (+{(newStats[2] - oldStats[2])})";

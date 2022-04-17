@@ -80,16 +80,16 @@ public class BattleHud : MonoBehaviour
 
     public int[] GetStats()
     {
-        int[] oldStats = new int[6];
+        int[] stats = new int[6];
 
-        oldStats[0] = _monster.HP;
-        oldStats[1] = _monster.Attack;
-        oldStats[3] = _monster.Defense;
-        oldStats[2] = _monster.SpAttack;
-        oldStats[4] = _monster.SpDefense;
-        oldStats[5] = _monster.Speed;
+        stats[0] = _monster.HP;
+        stats[1] = _monster.Attack;
+        stats[2] = _monster.SpAttack;
+        stats[3] = _monster.Defense;
+        stats[4] = _monster.SpDefense;
+        stats[5] = _monster.Speed;
 
-        return oldStats;
+        return stats;
     }
 
     public IEnumerator SetXPSmooth(bool reset = false)

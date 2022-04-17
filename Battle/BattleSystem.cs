@@ -383,11 +383,12 @@ public class BattleSystem : MonoBehaviour
                 playerUnit.Monster.BoostStatsAfterLevelUp();
                 int[] newStats = playerUnit.Hud.GetStats();
                 dialogBox.SetStatsBoxStats(oldStats, newStats);
-                dialogBox.EnableStatsBox(true);
-                
-                yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} reached Level {playerUnit.Monster.Level}!");
 
+                yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} reached Level {playerUnit.Monster.Level}!");
+                dialogBox.EnableStatsBox(true);
                 yield return playerUnit.Hud.SetXPSmooth(true);
+
+                yield return new WaitForSeconds(1f);
                 dialogBox.EnableStatsBox(false);
             }
 		
