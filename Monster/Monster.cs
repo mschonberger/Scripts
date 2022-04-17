@@ -242,9 +242,20 @@ public class Monster
     }
     public void BoostStatsAfterLevelUp()
     {
-        var oldMaxHp = MaxHp;
+        foreach (var kvp in Stats)
+        {
+            Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
+        }
+
+        var oldMaxHp = MaxHP;
         CalculateStats();
-        var diff = MaxHp - oldMaxHp;
+
+        foreach (var kvp in Stats)
+        {
+            Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
+        }
+
+        var diff = MaxHP - oldMaxHp;
 
         UpdateHP(-diff);
     }

@@ -13,6 +13,7 @@ public class BattleDialogBox : MonoBehaviour
     [SerializeField] GameObject moveSelector;
     [SerializeField] GameObject blackBox;
     [SerializeField] GameObject choiceBox;
+    [SerializeField] GameObject statsBox;
 
     [SerializeField] List<Text> actionTexts;
     [SerializeField] List<Image> actionBorder;
@@ -25,6 +26,13 @@ public class BattleDialogBox : MonoBehaviour
 
     [SerializeField] Text yesText;
     [SerializeField] Text noText;
+
+    [SerializeField] Text statHP;
+    [SerializeField] Text statAttack;
+    [SerializeField] Text statSpAttack;
+    [SerializeField] Text statDefense;
+    [SerializeField] Text statSpDefense;
+    [SerializeField] Text statSpeed;
 
     public void SetDialog(string dialog)
     {
@@ -56,6 +64,11 @@ public class BattleDialogBox : MonoBehaviour
     public void EnableChoiceBox(bool enabled)
     {
         choiceBox.SetActive(enabled);
+    }
+
+    public void EnableStatsBox(bool enabled)
+    {
+        statsBox.SetActive(enabled);
     }
 
     public void EnableBlackBox(bool enabled)
@@ -141,5 +154,15 @@ public class BattleDialogBox : MonoBehaviour
                 moveType[i].text = "-";
             }
         }
+    }
+
+    public void SetStatsBoxStats(int[] oldStats, int[] newStats)
+    {
+        statHP.text = $"{oldStats[0]} -> {newStats[0]} (+{(newStats[0] - oldStats[0])})";
+        statAttack.text = $"{oldStats[1]} -> {newStats[1]} (+{(newStats[1] - oldStats[1])})";
+        statSpAttack.text = $"{oldStats[2]} -> {newStats[2]} (+{(newStats[2] - oldStats[2])})";
+        statDefense.text = $"{oldStats[3]} -> {newStats[3]} (+{(newStats[3] - oldStats[3])})";
+        statSpDefense.text = $"{oldStats[4]} -> {newStats[4]} (+{(newStats[4] - oldStats[4])})";
+        statSpeed.text = $"{oldStats[5]} -> {newStats[5]} (+{(newStats[5] - oldStats[5])})";
     }
 }

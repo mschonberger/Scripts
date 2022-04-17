@@ -361,11 +361,13 @@ public class BattleSystem : MonoBehaviour
     	yield return dialogBox.TypeDialog($"{faintedUnit.Monster.Base.Name} fainted.");
     	faintedUnit.PlayFaintAnimation();
 	    yield return new WaitForSeconds(2f);
-	
-	    if (!faintedUnit.IsPlayerUnit) 
+
+        if (!faintedUnit.IsPlayerUnit) 
 	    {
-		    //EXP Gain
-		    int xpYield = faintedUnit.Monster.Base.XPGain;
+            int[] oldStats = playerUnit.Hud.GetStats();
+
+            //EXP Gain
+            int xpYield = faintedUnit.Monster.Base.XPGain;
 		    int enemyLevel = faintedUnit.Monster.Level;
 		    float trainerBonus = (isTrainerBattle) ? 1.5f : 1f;
 		
@@ -379,9 +381,14 @@ public class BattleSystem : MonoBehaviour
             {
                 playerUnit.Hud.SetLevel();
                 playerUnit.Monster.BoostStatsAfterLevelUp();
+                int[] newStats = playerUnit.Hud.GetStats();
+                dialogBox.SetStatsBoxStats(oldStats, newStats);
+                dialogBox.EnableStatsBox(true);
+                
                 yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} reached Level {playerUnit.Monster.Level}!");
 
                 yield return playerUnit.Hud.SetXPSmooth(true);
+                dialogBox.EnableStatsBox(false);
             }
 		
 		    yield return new WaitForSeconds(1f);

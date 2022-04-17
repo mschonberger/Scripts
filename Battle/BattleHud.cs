@@ -32,10 +32,12 @@ public class BattleHud : MonoBehaviour
 
         nameText.text = monster.Base.Name;
         SetLevel();
+        GetStats();
         hpDisplayText.text = $"{monster.HP} / {monster.MaxHP}";
         hpBar.SetHP((float)monster.HP / monster.MaxHP);
         SetXP();
-        
+
+
         statusColors = new Dictionary<ConditionID, Color>
         {
             {ConditionID.psn, psnColor },
@@ -44,7 +46,6 @@ public class BattleHud : MonoBehaviour
             {ConditionID.par, parColor },
             {ConditionID.frz, frzColor },
         };
-
 
         SetStatusText();
         _monster.OnStatusChanged += SetStatusText;
@@ -76,7 +77,21 @@ public class BattleHud : MonoBehaviour
     {
         levelText.text = "Lvl " + _monster.Level;
     }
-    
+
+    public int[] GetStats()
+    {
+        int[] oldStats = new int[6];
+
+        oldStats[0] = _monster.HP;
+        oldStats[1] = _monster.Attack;
+        oldStats[3] = _monster.Defense;
+        oldStats[2] = _monster.SpAttack;
+        oldStats[4] = _monster.SpDefense;
+        oldStats[5] = _monster.Speed;
+
+        return oldStats;
+    }
+
     public IEnumerator SetXPSmooth(bool reset = false)
     {
          if (xpBar == null) yield break;
