@@ -15,6 +15,7 @@ public class BattleHud : MonoBehaviour
     [SerializeField] Text statusText;
     [SerializeField] HPBar hpBar;
     [SerializeField] GameObject xpBar;
+    [SerializeField] Color hpBarColor;
 
     [SerializeField] Color psnColor;
     [SerializeField] Color brnColor;
@@ -34,7 +35,8 @@ public class BattleHud : MonoBehaviour
         SetLevel();
         GetStats();
         hpDisplayText.text = $"{monster.HP} / {monster.MaxHP}";
-        hpBar.SetHP((float)monster.HP / monster.MaxHP);
+        SetHPBarColor(_monster);
+        hpBar.SetHP((float)monster.HP / monster.MaxHP, hpBarColor);
         SetXP();
 
 
@@ -49,6 +51,20 @@ public class BattleHud : MonoBehaviour
 
         SetStatusText();
         _monster.OnStatusChanged += SetStatusText;
+    }
+
+    void SetHPBarColor(Monster monster)
+    {
+        hpBarColor = Color.green;
+
+        if ((float)monster.HP <= monster.MaxHP / 1.8 && (float)monster.HP > monster.MaxHP / 4)
+        {
+            hpBarColor = Color.yellow;
+        }
+        else if ((float)monster.HP <= monster.MaxHP / 4)
+        {
+           hpBarColor = Color.red;
+        } 
     }
 
     void SetStatusText()
@@ -117,7 +133,8 @@ public class BattleHud : MonoBehaviour
     {
         if (_monster.HPChanged)
         {
-            yield return hpBar.SetHPSmooth((float)_monster.HP / _monster.MaxHP);
+            SetHPBarColor(_monster);
+            yield return hpBar.SetHPSmooth((float)_monster.HP / _monster.MaxHP, hpBarColor);
             hpDisplayText.text = $"{_monster.HP} / {_monster.MaxHP}";
             _monster.HPChanged = false;
         }

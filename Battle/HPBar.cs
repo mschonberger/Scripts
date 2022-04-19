@@ -14,7 +14,13 @@ public class HPBar : MonoBehaviour
         health.transform.localScale = new Vector3(hpNormalized, 1f);
     }
 
-    public IEnumerator SetHPSmooth(float newHP)
+    public void SetHP(float hpNormalized, Color hpBarColor)
+    {
+        health.transform.localScale = new Vector3(hpNormalized, 1f);
+        health.GetComponent<Image>().color = hpBarColor;
+    }
+
+    public IEnumerator SetHPSmooth(float newHP, Color hpBarColor)
     {
         float currentHP = health.transform.localScale.x; //Aktueller Stand der HP
         float changeAmount = currentHP - newHP; // Wert der abgezogen werden muss
@@ -25,7 +31,7 @@ public class HPBar : MonoBehaviour
             health.transform.localScale = new Vector3(currentHP, 1f);
             yield return null;
         }
-
+        health.GetComponent<Image>().color = hpBarColor;
         health.transform.localScale = new Vector3(newHP, 1f);
     }
 }
