@@ -386,6 +386,22 @@ public class BattleSystem : MonoBehaviour
 
                 yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} reached Level {playerUnit.Monster.Level}!");
                 dialogBox.EnableStatsBox(true);
+				
+				//Try to learn new Move
+				var newMove = playerUnit.Monster.GetLearnableMoveAtCurrentLevel()
+				if (newMove != null)
+				{
+					if (playerUnit.Monster.Moves.Count < MonsterBase.MaxNumberOfMoves) 
+					{
+						playerUnit.Monster.LearnMove(newMove);
+						yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} learned {newMove.Base.Name}!");
+						dialogBox.SetMoveNames(playerUnit.Monster.Moves);
+					} else 
+					{
+						//Forget a Move
+					}
+				}
+				
                 yield return playerUnit.Hud.SetXPSmooth(true);
 
                 yield return new WaitForSeconds(1f);

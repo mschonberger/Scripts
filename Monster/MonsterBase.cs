@@ -33,6 +33,8 @@ public class MonsterBase : ScriptableObject
     [SerializeField] int catchRate; //between 0 and 255. higher = easier
 
     [SerializeField] List<LearnableMove> learnableMoves;
+	
+	public static int MaxNumberOfMoves {get; set;} = 4;
     
     public int GetXPForLevel (int level) 
     {
