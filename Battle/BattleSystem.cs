@@ -241,32 +241,49 @@ public class BattleSystem : MonoBehaviour
 
         if (CheckIfMoveHits(move, sourceUnit.Monster, targetUnit.Monster))
         {
-            sourceUnit.PlayAttackAnimation();
-            yield return new WaitForSeconds(1f);
 
-            targetUnit.PlayHitAnimation();
+            int hitTimes = move.Base.GetHitTimes();
+            int hits = 1;
+            float typeEffectiveness = 1f;
 
-            if (move.Base.Category == MoveCategory.Status)
+            for (int i = 1; i <= hitTimes; ++i)
             {
-                yield return RunMoveEffects(move.Base.Effects, sourceUnit.Monster, targetUnit.Monster, move.Base.Target);
-            }
-            else
-            {
-                var damageDetails = targetUnit.Monster.TakeDamage(move, sourceUnit.Monster);
-                yield return targetUnit.Hud.UpdateHP();
+                sourceUnit.PlayAttackAnimation();
+                yield return new WaitForSeconds(1f);
+                targetUnit.PlayHitAnimation();
 
-                yield return ShowDamageDetails(damageDetails);
-            }
-
-            if (move.Base.SecondaryEffects != null && move.Base.SecondaryEffects.Count > 0 && targetUnit.Monster.HP > 0)
-            {
-                foreach (var secondary in move.Base.SecondaryEffects)
+                if (move.Base.Category == MoveCategory.Status)
                 {
-                    var rnd = UnityEngine.Random.Range(1, 101);
-                    if (rnd <= secondary.Chance)
-                        yield return RunMoveEffects(secondary, sourceUnit.Monster, targetUnit.Monster, secondary.Target);
+                    yield return RunMoveEffects(move.Base.Effects, sourceUnit.Monster, targetUnit.Monster, move.Base.Target);
                 }
+                else
+                {
+                    var damageDetails = targetUnit.Monster.TakeDamage(move, sourceUnit.Monster);
+                    yield return targetUnit.Hud.UpdateHP();
+                    yield return ShowDamageDetails(damageDetails);
+                    typeEffectiveness = damageDetails.TypeEffectiveness;
+                }
+
+                if (move.Base.SecondaryEffects != null && move.Base.SecondaryEffects.Count > 0 && targetUnit.Monster.HP > 0)
+                {
+                    foreach (var secondary in move.Base.SecondaryEffects)
+                    {
+                        var rnd = UnityEngine.Random.Range(1, 101);
+                        if (rnd <= secondary.Chance)
+                            yield return RunMoveEffects(secondary, sourceUnit.Monster, targetUnit.Monster, secondary.Target);
+                    }
+                }
+
+                hits = i;
+                if (targetUnit.Monster.HP <= 0)
+                    break;
+
             }
+
+            yield return ShowEffectiveness(typeEffectiveness);
+
+            if (hitTimes > 1)
+                yield return dialogBox.TypeDialog($"The attack hit {hits} times!");
 
             if (targetUnit.Monster.HP <= 0)
             {
@@ -386,9 +403,10 @@ public class BattleSystem : MonoBehaviour
 
                 yield return dialogBox.TypeDialog($"{playerUnit.Monster.Base.Name} reached Level {playerUnit.Monster.Level}!");
                 dialogBox.EnableStatsBox(true);
-				
-				//Try to learn new Move
-				var newMove = playerUnit.Monster.GetLearnableMoveAtCurrentLevel()
+
+                //Try to learn new Move
+                var newMove = playerUnit.Monster.GetLearnableMoveAtCurrentLevel();
+
 				if (newMove != null)
 				{
 					if (playerUnit.Monster.Moves.Count < MonsterBase.MaxNumberOfMoves) 
@@ -447,10 +465,13 @@ public class BattleSystem : MonoBehaviour
     {
         if (damageDetails.Critical > 1f)
             yield return dialogBox.TypeDialog("That was a critical hit!");
+    }
 
-        if (damageDetails.TypeEffectiveness > 1f)
+    IEnumerator ShowEffectiveness(float typeEffectiveness)
+    {
+        if (typeEffectiveness > 1f)
             yield return dialogBox.TypeDialog("It's super effective!");
-        else if (damageDetails.TypeEffectiveness < 1f)
+        else if (typeEffectiveness < 1f)
             yield return dialogBox.TypeDialog("It's not very effective!");
     }
 

@@ -24,7 +24,25 @@ public class MoveBase : ScriptableObject
     [SerializeField] List<SecondaryEffects> secondaryEffects;
     [SerializeField] MoveEffects effects;
 
+    [SerializeField] Vector2Int hitRange;
 
+    public int GetHitTimes()
+    {
+        if (hitRange == Vector2.zero)
+            return 1;
+
+        int hitCount = 1;
+
+        if (hitRange.y == 0)
+        {
+            hitCount = hitRange.x;
+        } else
+        {
+            hitCount = Random.Range(hitRange.x, hitRange.y + 1);
+        }
+
+        return hitCount;
+    }
 
     public string Name
     {
