@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] Sprite sprite;
     [SerializeField] string playerName;
+    [SerializeField] SpriteMask tallGrassMask;
 
     const float offsetY = 0.3f;
 
@@ -31,6 +32,11 @@ public class PlayerController : MonoBehaviour
 
     public void HandleUpdate()
     {
+        if (Physics2D.OverlapCircle(transform.position - new Vector3(0, offsetY), 0.2f, GameLayers.i.GrassLayer) != null)
+            tallGrassMask.gameObject.SetActive(true);
+        else
+            tallGrassMask.gameObject.SetActive(false);
+
         if (!character.IsMoving)
         {
             input.x = Input.GetAxisRaw("Horizontal");
@@ -66,6 +72,7 @@ public class PlayerController : MonoBehaviour
                 OnEncountered();
             }
         }
+            
     }
 
     private void CheckIfInTrainersView()
