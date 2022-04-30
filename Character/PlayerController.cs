@@ -30,13 +30,16 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void HandleUpdate()
+    public void Update()
     {
         if (Physics2D.OverlapCircle(transform.position - new Vector3(0, offsetY), 0.2f, GameLayers.i.GrassLayer) != null)
             tallGrassMask.gameObject.SetActive(true);
         else
             tallGrassMask.gameObject.SetActive(false);
+    }
 
+    public void HandleUpdate()
+    {
         if (!character.IsMoving)
         {
             input.x = Input.GetAxisRaw("Horizontal");

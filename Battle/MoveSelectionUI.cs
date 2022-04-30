@@ -1,12 +1,12 @@
-using System
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MoveSelectionUI : MonoBehavior
+public class MoveSelectionUI : MonoBehaviour
 {
-    [SerializeField] List<text> moveTexts;
+    [SerializeField] List<Text> moveTexts;
     [SerializeField] Color highlightColor;
 
     int currentSelection = 0;
@@ -26,7 +26,7 @@ public class MoveSelectionUI : MonoBehavior
         if (Input.GetKeyDown(KeyCode.DownArrow))
             ++currentSelection;
         else if (Input.GetKeyDown(KeyCode.UpArrow))
-            --currentSelection
+            --currentSelection;
 
         currentSelection = Mathf.Clamp(currentSelection, 0, MonsterBase.MaxNumberOfMoves);
 
@@ -38,9 +38,9 @@ public class MoveSelectionUI : MonoBehavior
 
     public void UpdateMoveSelection(int selection)
     {
-        for (int i = 0; i < MonsterBase.MaxNumberOfMoves; i++)
+        for (int i = 0; i < MonsterBase.MaxNumberOfMoves + 1; i++)
         {
-            if (i = selection)
+            if (i == selection)
                 moveTexts[i].color = highlightColor;
             else
                 moveTexts[i].color = Color.black;

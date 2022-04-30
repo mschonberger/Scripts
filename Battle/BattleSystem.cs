@@ -2,6 +2,7 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -477,6 +478,8 @@ public class BattleSystem : MonoBehaviour
     {
         if (typeEffectiveness > 1f)
             yield return dialogBox.TypeDialog("It's super effective!");
+        else if (typeEffectiveness == 0f)
+            yield return dialogBox.TypeDialog("The attack doesn't work on the enemy!");
         else if (typeEffectiveness < 1f)
             yield return dialogBox.TypeDialog("It's not very effective!");
     }
@@ -511,7 +514,7 @@ public class BattleSystem : MonoBehaviour
                 } else
                 {
                     var selectedMove = playerUnit.Monster.Moves[moveIndex].Base;
-                    StartCoroutine(dialogBox.TypeDialog($"{selectedMove} was replaced by {moveToLearn.Name}!"));
+                    StartCoroutine(dialogBox.TypeDialog($"{selectedMove.Name} was replaced by {moveToLearn.Name}!"));
 
                     playerUnit.Monster.Moves[moveIndex] = new Move(moveToLearn);
                 }
@@ -520,7 +523,7 @@ public class BattleSystem : MonoBehaviour
                 state = BattleState.RunningTurn;
             };
 
-            MoveSelectionUI.HandleMoveSelection(onMoveSelected);
+            moveSelectionUI.HandleMoveSelection(onMoveSelected);
         }
     }
 
@@ -740,7 +743,6 @@ public class BattleSystem : MonoBehaviour
         moveToLearn = newMove;
 
         state = BattleState.MoveToForget;
-
     }
 
     IEnumerator SwitchMonster(Monster newMonster)
