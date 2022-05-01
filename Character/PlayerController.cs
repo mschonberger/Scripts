@@ -11,9 +11,6 @@ public class PlayerController : MonoBehaviour
 
     const float offsetY = 0.3f;
 
-    public event Action OnEncountered;
-    public event Action<Collider2D> OnEnterTrainerView;
-
     private Vector2 input;
 
     private Character character;
@@ -61,31 +58,17 @@ public class PlayerController : MonoBehaviour
 
     private void OnMoveOver()
     {
-        CheckForEncounters();
-        CheckIfInTrainersView();
-    }
-
-    private void CheckForEncounters() //Funktion zum triggern von Begegnugen mit wilden Monstern
-    {
-        if (Physics2D.OverlapCircle(transform.position - new Vector3(0, offsetY), 0.2f, GameLayers.i.GrassLayer) != null)
+        var colliders = Physics2D.OverlapCircleAll(transform.position - new Vector3(0, offsetY), 0.2f, GameLayers.i.TriggerableLayers);
+    
+        foreach (var collider in colliders)
         {
-            if (UnityEngine.Random.Range(1, 101) <= 10)
+            var triggerable = collider.GetComponent<INTERFACEPlayerTriggerable>();
+            if (triggerable != null)
             {
                 character.Animator.IsMoving = false;
-                OnEncountered();
+                triggerable.OnPlayerTriggered(this);
+                break;
             }
-        }
-            
-    }
-
-    private void CheckIfInTrainersView()
-    {
-        var collider = Physics2D.OverlapCircle(transform.position, offsetY, GameLayers.i.FieldOfViewLayer);
-
-        if (collider != null)
-        {
-            character.Animator.IsMoving = false;
-            OnEnterTrainerView?.Invoke(collider);
         }
     }
 

@@ -13,6 +13,7 @@ public class GameController : MonoBehaviour
     [SerializeField] Camera worldCamera;
 
     GameState state;
+    TrainerController trainer;
 
     public static GameController Instance { get; private set; }
     private void Awake()
@@ -23,18 +24,7 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        playerController.OnEncountered += StartBattle;
         battleSystem.OnBattleOver += EndBattle;
-
-        playerController.OnEnterTrainerView += (Collider2D trainerCollider) =>
-        {
-            var trainer = trainerCollider.GetComponentInParent<TrainerController>();
-            if (trainer != null)
-            {
-                state = GameState.Cutscene;
-                StartCoroutine(trainer.TriggerTrainerBattle(playerController));
-            }
-        };
 
         DialogManager.Instance.OnShowDialog += () =>
         {
@@ -48,7 +38,7 @@ public class GameController : MonoBehaviour
         };
     }
 
-    void StartBattle()
+    public void StartBattle()
     {
         state = GameState.Battle;
         battleSystem.gameObject.SetActive(true);
@@ -62,8 +52,6 @@ public class GameController : MonoBehaviour
         battleSystem.StartBattle(playerParty, wildMonsterClone);
     }
 
-    TrainerController trainer;
-
     public void StartTrainerBattle(TrainerController trainer)
     {
         state = GameState.Battle;
@@ -76,6 +64,12 @@ public class GameController : MonoBehaviour
         var trainerParty = trainer.GetComponent<MonsterParty>();
         
         battleSystem.StartTrainerBattle(playerParty, trainerParty);
+    }
+
+    public void OnEnterTrainersView(TrainerController trainer)
+    {
+        state = GameState.Cutscene;
+        StartCoroutine(trainer.TriggerTrainerBattle(playerController));
     }
 
     void EndBattle(bool won)
