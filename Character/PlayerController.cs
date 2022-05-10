@@ -9,8 +9,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] string playerName;
     [SerializeField] SpriteMask tallGrassMask;
 
-    const float offsetY = 0.3f;
-
     private Vector2 input;
 
     private Character character;
@@ -29,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     public void Update()
     {
-        if (Physics2D.OverlapCircle(transform.position - new Vector3(0, offsetY), 0.2f, GameLayers.i.GrassLayer) != null)
+        if (Physics2D.OverlapCircle(transform.position - new Vector3(0, character.OffsetY), 0.2f, GameLayers.i.GrassLayer) != null)
             tallGrassMask.gameObject.SetActive(true);
         else
             tallGrassMask.gameObject.SetActive(false);
@@ -58,7 +56,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnMoveOver()
     {
-        var colliders = Physics2D.OverlapCircleAll(transform.position - new Vector3(0, offsetY), 0.2f, GameLayers.i.TriggerableLayers);
+        var colliders = Physics2D.OverlapCircleAll(transform.position - new Vector3(0, character.OffsetY), 0.2f, GameLayers.i.TriggerableLayers);
     
         foreach (var collider in colliders)
         {
@@ -95,5 +93,7 @@ public class PlayerController : MonoBehaviour
     {
         get => sprite;
     }
+
+    public Character Character => character;
 
 }

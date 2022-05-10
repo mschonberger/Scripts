@@ -10,11 +10,22 @@ public class Character : MonoBehaviour
 
     public bool IsMoving { get; private set; }
 
+    public float OffsetY { get; private set; } = 0.3f;
+
     CharacterAnimator animator;
 
     private void Awake()
     {
         animator = GetComponent<CharacterAnimator>();
+        SetPositionAndSnapToTile(transform.position);
+    }
+
+    public void SetPositionAndSnapToTile(Vector2 position)
+    {
+        position.x = Mathf.Floor(position.x) + 0.5f;
+        position.y = Mathf.Floor(position.y) + 0.5f + OffsetY;
+
+        transform.position = position;
     }
 
     public IEnumerator Move(Vector2 moveVector, Action OnMoveOver = null) // Für den Gebrauch über Zeit, hier einen IEnum, überprüft ob 
