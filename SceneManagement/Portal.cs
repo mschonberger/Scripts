@@ -8,6 +8,7 @@ public class Portal : MonoBehaviour, INTERFACEPlayerTriggerable
 {
     [SerializeField] int sceneToLoad = -1;
     [SerializeField] Transform spawnPoint;
+    [SerializeField] DestinationIdentifier destinationPortal;
 
     PlayerController player;
 
@@ -20,10 +21,15 @@ public class Portal : MonoBehaviour, INTERFACEPlayerTriggerable
     IEnumerator SwitchScene()
     {
         DontDestroyOnLoad(gameObject);
+
+        GameController.Instance.PauseGame(true);
+
         yield return SceneManager.LoadSceneAsync(sceneToLoad);
 
-        var destinationPortal = FindObjectsOfType<Portal>().First(x => x != this);
+        var destinationPortal = FindObjectsOfType<Portal>().First(x => x != this && x.destinationPortal == this.destinationPortal);
         player.Character.SetPositionAndSnapToTile(destinationPortal.SpawnPoint.position);
+
+        GameController.Instance.PauseGame(false);
 
         Destroy(gameObject);
     }
@@ -31,3 +37,5 @@ public class Portal : MonoBehaviour, INTERFACEPlayerTriggerable
     public Transform SpawnPoint => spawnPoint;
 
 }
+
+public enum DestinationIdentifier { A, B, C, D, E, F, G, H}
