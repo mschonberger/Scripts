@@ -13,6 +13,10 @@ public class Portal : MonoBehaviour, INTERFACEPlayerTriggerable
     PlayerController player;
     Fader fader;
 
+    public Vector2 cameraChangeMin;
+    public Vector2 cameraChangeMax;
+    private CameraMovement cam;
+
     public void OnPlayerTriggered(PlayerController player)
     {
         this.player = player;
@@ -22,6 +26,7 @@ public class Portal : MonoBehaviour, INTERFACEPlayerTriggerable
     private void Start()
     {
         fader = FindObjectOfType<Fader>();
+        cam = Camera.main.GetComponent<CameraMovement>();
     }
 
     IEnumerator SwitchScene()
@@ -35,6 +40,11 @@ public class Portal : MonoBehaviour, INTERFACEPlayerTriggerable
 
         var destinationPortal = FindObjectsOfType<Portal>().First(x => x != this && x.destinationPortal == this.destinationPortal);
         player.Character.SetPositionAndSnapToTile(destinationPortal.SpawnPoint.position);
+
+        cam.minPosition.x += cameraChangeMin.x;
+        cam.minPosition.y += cameraChangeMin.y;
+        cam.maxPosition.x += cameraChangeMax.x;
+        cam.maxPosition.y += cameraChangeMax.y;
 
         yield return fader.FadeOut(0.5f);
         GameController.Instance.PauseGame(false);

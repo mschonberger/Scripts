@@ -10,7 +10,7 @@ public class Fader : MonoBehaviour
 
     private void Awake()
     {
-        image = GetComponent<image>();
+        image = GetComponent<Image>();
     }
 
     public IEnumerator FadeIn(float time)
